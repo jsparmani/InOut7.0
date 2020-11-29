@@ -1,4 +1,4 @@
-import {Product} from "./Product";
+import {Cart} from "./Cart";
 import {User} from "./User";
 import {OrderStatus} from "./../types/orderStatusTypes";
 import {Field, Int, ObjectType} from "type-graphql";
@@ -7,8 +7,6 @@ import {
     Column,
     Entity,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
     ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -33,15 +31,15 @@ export class Order extends BaseEntity {
     })
     status: OrderStatus;
 
-    @Field(() => [Product])
-    @ManyToMany(() => Product)
-    @JoinTable()
-    products: Product[];
-
     @Field(() => Address)
     @OneToOne(() => Address)
     @JoinColumn()
     address: Address;
+
+    @Field(() => Cart)
+    @OneToOne(() => Cart)
+    @JoinColumn()
+    cart: Cart;
 
     @Field()
     @Column()

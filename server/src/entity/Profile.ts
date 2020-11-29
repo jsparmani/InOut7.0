@@ -32,7 +32,7 @@ export class Profile extends BaseEntity {
     gender: Gender;
 
     @Field()
-    @Column()
+    @Column({unique: true})
     phone: string;
 
     @Field(() => [Address])

@@ -1,3 +1,4 @@
+import {Cart} from "./Cart";
 import {Order} from "./Order";
 import {Store} from "./Store";
 import {Profile} from "./Profile";
@@ -40,6 +41,11 @@ export class User extends BaseEntity {
     @Field(() => [Order])
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];
+
+    @Field(() => Cart)
+    @OneToOne(() => Cart, (cart) => cart.user)
+    @JoinColumn()
+    cart: Cart;
 
     @Column()
     password: string;

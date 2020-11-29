@@ -21,7 +21,7 @@ export class Product extends BaseEntity {
     name: string;
 
     @Field()
-    @Column()
+    @Column({unique: true})
     code: string;
 
     @Field(() => Int)
