@@ -1,4 +1,4 @@
-import { Gender } from "src/types/genderTypes";
+import { Gender } from "../../types/genderTypes";
 import { Field, InputType } from "type-graphql";
 
 @InputType()

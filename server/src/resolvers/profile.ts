@@ -1,7 +1,7 @@
-import { Profile } from "src/entity/Profile";
-import { FieldError } from "src/types/FieldError";
-import { MyContext } from "src/types/MyContext";
-import { validateProfileCreate } from "src/utils/validateProfile";
+import { Profile } from "../entity/Profile";
+import { FieldError } from "../types/FieldError";
+import { MyContext } from "../types/MyContext";
+import { validateProfileCreate } from "../utils/validateProfile";
 import { Arg, Ctx, Field, ObjectType, Resolver } from "type-graphql";
 import { ProfileInput } from "./inputs/ProfileInput";
 
