@@ -2,7 +2,7 @@ import { Profile } from "../entity/Profile";
 import { FieldError } from "../types/FieldError";
 import { MyContext } from "../types/MyContext";
 import { validateProfileCreate } from "../utils/validateProfile";
-import { Arg, Ctx, Field, ObjectType, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
 import { ProfileInput } from "./inputs/ProfileInput";
 
 @ObjectType()
@@ -16,7 +16,7 @@ class ProfileResponse {
 
 @Resolver()
 export class ProfileResolver {
-    @Query(() => ProfileResponse)
+    @Mutation(() => ProfileResponse)
     async createProfile(
         @Arg("input", () => ProfileInput) input: ProfileInput,
         @Ctx() {res}: MyContext
