@@ -2,7 +2,7 @@ import { Profile } from "../entity/Profile";
 import { FieldError } from "../types/FieldError";
 import { MyContext } from "../types/MyContext";
 import { validateProfileCreate } from "../utils/validateProfile";
-import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from "type-graphql";
 import { ProfileInput } from "./inputs/ProfileInput";
 import { isAuth } from "../middleware/isAuth";
 

@@ -11,22 +11,23 @@ export class Profile extends BaseEntity {
     id: number;
 
     @Field()
-    @Column()
+    @Column({nullable: true})
     name: string;
 
     @Field(() => Int)
-    @Column("int")
+    @Column("int", {nullable: true})
     age: number;
 
     @Field(() => Gender)
     @Column({
         type: "enum",
         enum: Gender,
+        nullable: true
     })
     gender: Gender;
 
     @Field()
-    @Column()
+    @Column({nullable: true})
     phone: string;
 
     @OneToMany(() => Address, address => address.profile)
