@@ -16,7 +16,7 @@ export class Profile extends BaseEntity {
 
     @Field(() => Int)
     @Column("int")
-    age: string;
+    age: number;
 
     @Field(() => Gender)
     @Column({
