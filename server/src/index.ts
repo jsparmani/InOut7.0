@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import {User} from "./entity/User";
 import {createRefreshToken, createAccessToken} from "./utils/auth";
 import {sendRefreshToken} from "./utils/sendRefreshToken";
+import { ProfileResolver } from "./resolvers/profile";
 
 (async () => {
     const app = express();
@@ -53,7 +54,7 @@ import {sendRefreshToken} from "./utils/sendRefreshToken";
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, ProfileResolver],
             validate: false,
         }),
         context: ({req, res}) => ({req, res}),
