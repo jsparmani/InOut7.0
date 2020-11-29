@@ -2,8 +2,9 @@ import { Profile } from "../entity/Profile";
 import { FieldError } from "../types/FieldError";
 import { MyContext } from "../types/MyContext";
 import { validateProfileCreate } from "../utils/validateProfile";
-import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "type-graphql";
 import { ProfileInput } from "./inputs/ProfileInput";
+import { isAuth } from "../middleware/isAuth";
 
 @ObjectType()
 class ProfileResponse {
@@ -16,6 +17,7 @@ class ProfileResponse {
 
 @Resolver()
 export class ProfileResolver {
+    @UseMiddleware(isAuth)
     @Mutation(() => ProfileResponse)
     async createProfile(
         @Arg("input", () => ProfileInput) input: ProfileInput,
@@ -38,8 +40,16 @@ export class ProfileResolver {
                 phone: phone
             }).save();
         } catch (err) {
-            // invalid phone number
-            console.log(err.code);
+            if (err.code === '22P02') {
+                return {
+                    errors: [
+                        {
+                            field: "gender",
+                            message: "Please use 'male', 'female' or 'others' for gender field",
+                        },
+                    ],
+                };
+            }
         }
         return {profile}
     }
