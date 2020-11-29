@@ -28,6 +28,18 @@ export class ProfileResolver {
             return {errors};
         }
 
-        
+        let profile;
+        try {
+            profile = await Profile.create({
+                name: name,
+                age: age,
+                gender: gender,
+                phone: phone
+            }).save();
+        } catch (err) {
+            // invalid phone number
+            console.log(err.code);
+        }
+        return {profile}
     }
 }

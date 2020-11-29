@@ -1,3 +1,4 @@
+import { Gender } from "src/types/genderTypes";
 import { Field, InputType } from "type-graphql";
 
 @InputType()
@@ -9,7 +10,7 @@ export class ProfileInput {
     age: number;
 
     @Field()
-    gender: string;
+    gender: Gender;
 
     @Field()
     phone: string;
