@@ -1,3 +1,4 @@
+import { Min } from "class-validator";
 import { Field, Int, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
@@ -17,6 +18,7 @@ export class Product extends BaseEntity {
     code: string;
 
     @Field(() => Int)
-    @Column()
+    @Column({default: 0})
+    @Min(0)
     availableQty: number;
 }
