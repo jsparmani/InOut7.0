@@ -16,7 +16,7 @@ export class Product extends BaseEntity {
     @Column()
     code: string;
 
-    @Field()
+    @Field(() => Int)
     @Column()
     availableQty: number;
 }
