@@ -1,7 +1,13 @@
 import {Field, Int, ObjectType} from "type-graphql";
-import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import {Gender} from "../types/genderTypes";
-import { Address } from "./Address";
+import {Address} from "./Address";
 
 @ObjectType()
 @Entity()
@@ -16,7 +22,7 @@ export class Profile extends BaseEntity {
 
     @Field(() => Int)
     @Column("int")
-    age: string;
+    age: number;
 
     @Field(() => Gender)
     @Column({
@@ -29,6 +35,7 @@ export class Profile extends BaseEntity {
     @Column()
     phone: string;
 
-    @OneToMany(() => Address, address => address.profile)
+    @Field(() => [Address])
+    @OneToMany(() => Address, (address) => address.profile)
     addresses: Address[];
 }
