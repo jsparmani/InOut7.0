@@ -34,6 +34,23 @@ export class ProfileResolver {
 
         let profile;
         try {
+            let user;
+            if(payload !== undefined) {
+                user = await User.findOne(parseInt(payload.userId), {
+                    relations: ['profile']
+                });
+            } else {
+                throw new Error('No user with given id!');
+            }
+
+            if (!user) {
+                throw new Error('User does not exist!');
+            }
+
+            if(user.profile !== null) {
+                throw 409;
+            }
+
             profile = Profile.create({
                 name: name,
                 age: age,
@@ -44,12 +61,6 @@ export class ProfileResolver {
 
             if(!payload?.userId) {
                 throw new Error('Invalid User');
-            }
-
-            let user = await User.findOne(parseInt(payload.userId));
-
-            if (!user) {
-                throw new Error('User does not exist!');
             }
 
             user.profile = profile;
@@ -64,6 +75,16 @@ export class ProfileResolver {
                             message: "Please use 'male', 'female' or 'others' for gender field",
                         },
                     ],
+                };
+            }
+            if(err === 409) {
+                return {
+                    errors: [
+                        {
+                            field: "profile",
+                            message: "The Profile for this user already exists"
+                        }
+                    ]
                 };
             }
         }
