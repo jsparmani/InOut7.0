@@ -13,9 +13,11 @@ import {
     ObjectType,
     Query,
     Resolver,
+    UseMiddleware,
 } from "type-graphql";
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
+import { isAuth } from "src/middleware/isAuth";
 
 @ObjectType()
 class AuthResponse {
@@ -127,5 +129,22 @@ export class UserResolver {
     async logout(@Ctx() {res}: MyContext) {
         sendRefreshToken(res, "");
         return true;
+    }
+
+    @UseMiddleware(isAuth)
+    @Query(() => AuthResponse)
+    async getUserProfile(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
+        if(!payload?.userId) {
+            throw new Error('Invalid User');
+        }
+
+        let user = await User.findOne(parseInt(payload.userId));
+
+        if (!user) {
+            throw new Error('User does not exist!');
+        }
+        return {
+            user
+        };
     }
 }
