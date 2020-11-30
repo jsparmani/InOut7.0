@@ -1,7 +1,13 @@
 import { ProfileInput } from "src/resolvers/inputs/ProfileInput";
 
-export const validateProfileCreate = (options: ProfileInput) => {
+export const validateProfileCreateOrUpdate = (options: ProfileInput) => {
     const {name, age, gender, phone} = options;
+    if(name === "" || name === null || name === undefined) {
+        return [{field: "name", message: "Specify name"}];
+    }
+    if(age === null || age === undefined) {
+        return [{field: "age", message: "Specify age"}];
+    }
     if(phone.length !== 10) {
         return [{field: "phone", message: "Invalid phone number"}];
     }
