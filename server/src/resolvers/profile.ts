@@ -1,12 +1,20 @@
-import { Profile } from "../entity/Profile";
-import { FieldError } from "../types/FieldError";
-import { MyContext } from "../types/MyContext";
-import { validateProfileCreate, validateProfileCreateOrUpdate } from "../utils/validateProfile";
-import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "type-graphql";
-import { ProfileInput } from "./inputs/ProfileInput";
-import { isAuth } from "../middleware/isAuth";
-import { User } from "../entity/User";
-import { getConnection } from "typeorm";
+import {Profile} from "../entity/Profile";
+import {FieldError} from "../types/FieldError";
+import {MyContext} from "../types/MyContext";
+import {validateProfileCreateOrUpdate} from "../utils/validateProfile";
+import {
+    Arg,
+    Ctx,
+    Field,
+    Mutation,
+    ObjectType,
+    Resolver,
+    UseMiddleware,
+} from "type-graphql";
+import {ProfileInput} from "./inputs/ProfileInput";
+import {isAuth} from "../middleware/isAuth";
+import {User} from "../entity/User";
+import {getConnection} from "typeorm";
 
 @ObjectType()
 class ProfileResponse {
@@ -29,15 +37,15 @@ export class ProfileResolver {
             return {
                 errors: [
                     {
-                        field: 'userId',
-                        message: 'Missing',
+                        field: "userId",
+                        message: "Missing",
                     },
                 ],
             };
         }
 
         const user = await User.findOne(parseInt(payload.userId), {
-            relations: ['profile'],
+            relations: ["profile"],
         });
 
         const {name, age, gender, phone} = input;
@@ -46,8 +54,8 @@ export class ProfileResolver {
             return {
                 errors: [
                     {
-                        field: 'userId',
-                        message: 'Does not exist!',
+                        field: "userId",
+                        message: "Does not exist!",
                     },
                 ],
             };
@@ -60,7 +68,7 @@ export class ProfileResolver {
             };
         }
 
-        if(user.profile) {
+        if (user.profile) {
             let profile = user.profile;
             profile.name = name;
             profile.age = age;

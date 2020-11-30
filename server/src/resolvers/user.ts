@@ -17,7 +17,7 @@ import {
 } from "type-graphql";
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
-import { isAuth } from "../middleware/isAuth";
+import {isAuth} from "../middleware/isAuth";
 
 @ObjectType()
 class AuthResponse {
@@ -133,20 +133,20 @@ export class UserResolver {
 
     @UseMiddleware(isAuth)
     @Query(() => AuthResponse)
-    async getUserAndProfile(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
-        if(!payload?.userId) {
-            throw new Error('Invalid User');
+    async me(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
+        if (!payload?.userId) {
+            throw new Error("Invalid User");
         }
 
         let user = await User.findOne(parseInt(payload.userId), {
-            relations: ['profile']
+            relations: ["profile"],
         });
 
         if (!user) {
-            throw new Error('User does not exist!');
+            throw new Error("User does not exist!");
         }
         return {
-            user
+            user,
         };
     }
 }
