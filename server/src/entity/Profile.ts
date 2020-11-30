@@ -28,12 +28,14 @@ export class Profile extends BaseEntity {
     @Column({
         type: "enum",
         enum: Gender,
+        nullable: true,
     })
     gender: Gender;
 
     @Field()
     @Column({unique: true})
     phone: string;
+
 
     @Field(() => [Address])
     @OneToMany(() => Address, (address) => address.profile)
