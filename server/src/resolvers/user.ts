@@ -17,7 +17,7 @@ import {
 } from "type-graphql";
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
-import { isAuth } from "src/middleware/isAuth";
+import { isAuth } from "../middleware/isAuth";
 
 @ObjectType()
 class AuthResponse {
@@ -138,7 +138,9 @@ export class UserResolver {
             throw new Error('Invalid User');
         }
 
-        let user = await User.findOne(parseInt(payload.userId));
+        let user = await User.findOne(parseInt(payload.userId), {
+            relations: ['profile']
+        });
 
         if (!user) {
             throw new Error('User does not exist!');

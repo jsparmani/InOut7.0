@@ -2,9 +2,10 @@ import { Profile } from "../entity/Profile";
 import { FieldError } from "../types/FieldError";
 import { MyContext } from "../types/MyContext";
 import { validateProfileCreate } from "../utils/validateProfile";
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "type-graphql";
 import { ProfileInput } from "./inputs/ProfileInput";
 import { isAuth } from "../middleware/isAuth";
+import { User } from "../entity/User";
 
 @ObjectType()
 class ProfileResponse {
@@ -21,7 +22,7 @@ export class ProfileResolver {
     @Mutation(() => ProfileResponse)
     async createProfile(
         @Arg("input", () => ProfileInput) input: ProfileInput,
-        @Ctx() {res}: MyContext
+        @Ctx() {payload}: MyContext
     ): Promise<ProfileResponse> {
         const {name, age, gender, phone} = input;
 
@@ -33,12 +34,27 @@ export class ProfileResolver {
 
         let profile;
         try {
-            profile = await Profile.create({
+            profile = Profile.create({
                 name: name,
                 age: age,
                 gender: gender,
                 phone: phone
-            }).save();
+            });
+            await profile.save();
+
+            if(!payload?.userId) {
+                throw new Error('Invalid User');
+            }
+
+            let user = await User.findOne(parseInt(payload.userId));
+
+            if (!user) {
+                throw new Error('User does not exist!');
+            }
+
+            user.profile = profile;
+            await user.save();
+
         } catch (err) {
             if (err.code === '22P02') {
                 return {
