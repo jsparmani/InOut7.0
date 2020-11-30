@@ -133,7 +133,7 @@ export class UserResolver {
 
     @UseMiddleware(isAuth)
     @Query(() => AuthResponse)
-    async getUserProfile(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
+    async getUserAndProfile(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
         if(!payload?.userId) {
             throw new Error('Invalid User');
         }
