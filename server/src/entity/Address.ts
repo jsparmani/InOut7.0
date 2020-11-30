@@ -1,7 +1,13 @@
-import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import {State} from "../types/states";
-import { Profile } from "./Profile";
+import {Field, Int, ObjectType} from "type-graphql";
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
+import {State} from "../types/stateTypes";
+import {Profile} from "./Profile";
 
 @ObjectType()
 @Entity()
@@ -38,6 +44,6 @@ export class Address extends BaseEntity {
     state: State;
 
     @Field(() => Profile)
-    @ManyToOne(() => Profile, profile => profile.addresses)
+    @ManyToOne(() => Profile, (profile) => profile.addresses)
     profile: Profile;
 }

@@ -1,6 +1,13 @@
-import { Min } from "class-validator";
-import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {Store} from "./Store";
+import {Min} from "class-validator";
+import {Field, Int, ObjectType} from "type-graphql";
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -14,11 +21,15 @@ export class Product extends BaseEntity {
     name: string;
 
     @Field()
-    @Column()
+    @Column({unique: true})
     code: string;
 
     @Field(() => Int)
     @Column({default: 0})
     @Min(0)
     availableQty: number;
+
+    @Field(() => Store)
+    @ManyToOne(() => Store, (store) => store.products)
+    store: Store;
 }

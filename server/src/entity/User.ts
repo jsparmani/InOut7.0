@@ -1,3 +1,6 @@
+import {Cart} from "./Cart";
+import {Order} from "./Order";
+import {Store} from "./Store";
 import {Profile} from "./Profile";
 import {Field, Int, ObjectType} from "type-graphql";
 import {
@@ -5,6 +8,8 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToMany,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
@@ -24,6 +29,23 @@ export class User extends BaseEntity {
     @OneToOne(() => Profile, {nullable: true})
     @JoinColumn()
     profile: Profile;
+
+    @Field(() => [Store])
+    @ManyToMany(() => Store, (store) => store.admins)
+    stores: Store[];
+
+    @Field(() => [Store])
+    @ManyToMany(() => Store, (store) => store.subscribers)
+    subscriptions: Store[];
+
+    @Field(() => [Order])
+    @OneToMany(() => Order, (order) => order.user)
+    orders: Order[];
+
+    @Field(() => Cart)
+    @OneToOne(() => Cart, (cart) => cart.user)
+    @JoinColumn()
+    cart: Cart;
 
     @Column()
     password: string;
