@@ -13,6 +13,8 @@ import { isAuth } from "..//middleware/isAuth";
 import { AddressInput } from "./inputs/AddressInput";
 import { MyContext } from "src/types/MyContext";
 import { User } from "src/entity/User";
+import { validateAddressCreate } from "src/utils/validateAddress";
+import { getConnection } from "typeorm";
 
 @ObjectType()
 class AddressResponse {
@@ -45,6 +47,16 @@ export class AddressResolver {
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["profile"],
         });
+        if(!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
         if(!user.profile) {
             return {
                 errors: [
@@ -57,5 +69,16 @@ export class AddressResolver {
         }
 
         const errors = validateAddressCreate(input);
+        if (errors) {
+            return {
+                errors,
+            };
+        }
+
+        const addressInstance = await Address.create({...input}).save();
+        const userProfile = user.profile;
+        userProfile.addresses.push(addressInstance);
+        await getConnection().manager.save(userProfile);
+        return {address: addressInstance}
     }
 }
