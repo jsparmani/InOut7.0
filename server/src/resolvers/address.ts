@@ -78,9 +78,6 @@ export class AddressResolver {
         const addressInstance = await Address.create({...input});
         addressInstance.profile = user.profile;
         await getConnection().manager.save(addressInstance);
-        // const userProfile = user.profile;
-        // userProfile.addresses.push(addressInstance);
-        // await getConnection().manager.save(userProfile);
         return {address: addressInstance}
     }
 }
