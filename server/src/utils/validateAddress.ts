@@ -20,4 +20,5 @@ export const validateAddressCreate = (options: AddressInput) => {
     if(!state) {
         return [{field: "state", message: "Specify state"}];
     }
+    return null;
 }
