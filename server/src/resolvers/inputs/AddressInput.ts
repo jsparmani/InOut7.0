@@ -1,4 +1,4 @@
-import { State } from "src/types/stateTypes";
+import { State } from "../../types/stateTypes";
 import { Field, InputType } from "type-graphql";
 
 @InputType()

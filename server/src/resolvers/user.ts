@@ -18,6 +18,7 @@ import {
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
 import {isAuth} from "../middleware/isAuth";
+import { Profile } from "../entity/Profile";
 
 @ObjectType()
 class AuthResponse {
@@ -139,7 +140,7 @@ export class UserResolver {
         }
 
         let user = await User.findOne(parseInt(payload.userId), {
-            relations: ["profile"],
+            relations: ["profile", "profile.addresses"],
         });
 
         if (!user) {

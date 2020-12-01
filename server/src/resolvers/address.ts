@@ -9,11 +9,11 @@ import {
     Resolver,
     UseMiddleware
 } from "type-graphql";
-import { isAuth } from "..//middleware/isAuth";
+import { isAuth } from "../middleware/isAuth";
 import { AddressInput } from "./inputs/AddressInput";
-import { MyContext } from "src/types/MyContext";
-import { User } from "src/entity/User";
-import { validateAddressCreate } from "src/utils/validateAddress";
+import { MyContext } from "../types/MyContext";
+import { User } from "../entity/User";
+import { validateAddressCreate } from "../utils/validateAddress";
 import { getConnection } from "typeorm";
 
 @ObjectType()
@@ -30,7 +30,7 @@ export class AddressResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => AddressResponse)
     async createAddress(
-        @Arg("input", () => Address) input: AddressInput,
+        @Arg("input", () => AddressInput) input: AddressInput,
         @Ctx() {payload}: MyContext
     ): Promise<AddressResponse> {
         if (!payload?.userId) {
@@ -75,10 +75,12 @@ export class AddressResolver {
             };
         }
 
-        const addressInstance = await Address.create({...input}).save();
-        const userProfile = user.profile;
-        userProfile.addresses.push(addressInstance);
-        await getConnection().manager.save(userProfile);
+        const addressInstance = await Address.create({...input});
+        addressInstance.profile = user.profile;
+        await getConnection().manager.save(addressInstance);
+        // const userProfile = user.profile;
+        // userProfile.addresses.push(addressInstance);
+        // await getConnection().manager.save(userProfile);
         return {address: addressInstance}
     }
 }
