@@ -4,10 +4,10 @@ import { Field, InputType } from "type-graphql";
 @InputType()
 export class AddressInput {
     @Field()
-    houseNumber: String;
+    houseNumber: string;
 
     @Field()
-    street: String;
+    street: string;
 
     @Field()
     landmark: string;
