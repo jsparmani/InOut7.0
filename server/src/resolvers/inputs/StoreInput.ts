@@ -8,9 +8,9 @@ export class StoreCreateInput {
     @Field()
     description: string;
 
-    @Field()
-    // input.admins is array of user ids
+    @Field(() => [Number], {nullable: true})
     admins: number[];
+    // input.admins is array of user ids
 }
 
 @InputType()

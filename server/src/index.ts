@@ -13,6 +13,7 @@ import {createRefreshToken, createAccessToken} from "./utils/auth";
 import {sendRefreshToken} from "./utils/sendRefreshToken";
 import { ProfileResolver } from "./resolvers/profile";
 import { AddressResolver } from "./resolvers/address";
+import { StoreResolver } from "./resolvers/store";
 
 (async () => {
     const app = express();
@@ -55,7 +56,7 @@ import { AddressResolver } from "./resolvers/address";
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver, ProfileResolver, AddressResolver],
+            resolvers: [UserResolver, ProfileResolver, AddressResolver, StoreResolver],
             validate: false,
         }),
         context: ({req, res}) => ({req, res}),

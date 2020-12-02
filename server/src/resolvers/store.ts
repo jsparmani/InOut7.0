@@ -44,6 +44,7 @@ export class StoreResolver {
         let store = await Store.create({
             name: input.name,
             description: input.description,
+            admins: []
         })
 
         if (!payload?.userId) {
@@ -73,9 +74,9 @@ export class StoreResolver {
 
         store.admins.push(user);
 
-        for(var adminId in input.admins) {
+        for(var i in input.admins) {
             // input.admins is array of user ids
-            var admin = await User.findOne(adminId);
+            var admin = await User.findOne(input.admins[i]);
             if(!admin) {
                 return {
                     errors: [

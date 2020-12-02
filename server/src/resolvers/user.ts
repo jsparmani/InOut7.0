@@ -18,7 +18,6 @@ import {
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
 import {isAuth} from "../middleware/isAuth";
-import { Profile } from "../entity/Profile";
 
 @ObjectType()
 class AuthResponse {
