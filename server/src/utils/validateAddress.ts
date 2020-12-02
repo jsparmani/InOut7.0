@@ -1,4 +1,4 @@
-import { AddressInput } from "src/resolvers/inputs/AddressInput";
+import { AddressInput } from "../resolvers/inputs/AddressInput";
 
 export const validateAddressCreate = (options: AddressInput) => {
     const {houseNumber, street, landmark, num, city, state} = options;

@@ -1,7 +1,10 @@
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class StoreCreateInput {
+export class StoreCreateOrUpdateInput {
+    @Field({nullable: true})
+    storeId: number;
+
     @Field()
     name: string;
 

@@ -1,5 +1,5 @@
-import { Store } from "src/entity/Store";
-import { User } from "src/entity/User";
+import { Store } from "../entity/Store";
+import { User } from "../entity/User";
 import { ProductInput } from "../resolvers/inputs/ProductInput";
 
 export const validateProductCreate = (options: ProductInput) => {

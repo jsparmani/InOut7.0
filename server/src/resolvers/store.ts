@@ -3,7 +3,7 @@ import { User } from "../entity/User";
 import { isAuth } from "../middleware/isAuth";
 import { FieldError } from "../types/FieldError";
 import { MyContext } from "../types/MyContext";
-import { validateCreateStore } from "../utils/validateStore";
+import { isAdmin, validateCreateOrUpdateStore } from "../utils/validateStore";
 import { 
     Arg,
     Ctx,
@@ -15,7 +15,7 @@ import {
     UseMiddleware
 } from "type-graphql";
 import { getConnection } from "typeorm";
-import { StoreCreateInput, StoreGetInput } from "./inputs/StoreInput";
+import { StoreCreateOrUpdateInput, StoreGetInput } from "./inputs/StoreInput";
 
 @ObjectType()
 class StoreResponse {
@@ -34,10 +34,10 @@ export class StoreResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => StoreResponse)
     async createStore(
-        @Arg("input", () => StoreCreateInput) input: StoreCreateInput,
+        @Arg("input", () => StoreCreateOrUpdateInput) input: StoreCreateOrUpdateInput,
         @Ctx() {payload}: MyContext
     ): Promise<StoreResponse> {
-        const errors = validateCreateStore(input);
+        const errors = validateCreateOrUpdateStore(input);
         if(errors) {
             return {
                 errors,
@@ -177,5 +177,93 @@ export class StoreResolver {
         var stores = user.stores;
 
         return {stores};
+    }
+
+    @UseMiddleware(isAuth)
+    @Mutation(() => StoreResponse)
+    async updateStore(
+        @Arg("input", () => StoreCreateOrUpdateInput) input: StoreCreateOrUpdateInput,
+        @Ctx() {payload}: MyContext
+    ): Promise<StoreResponse> {
+        if (!payload?.userId) {
+            return {
+                errors: [
+                    {
+                        field: "userId",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+
+        const user = await User.findOne(parseInt(payload.userId), {
+            relations: ["profile"],
+        });
+        if(!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+        const errors = validateCreateOrUpdateStore(input)
+        if(errors) {
+            return {
+                errors
+            };
+        }
+
+        if(!input.storeId) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: "Provide id for updation"
+                    }
+                ]
+            }
+        }
+        const store = await Store.findOne(input.storeId);
+        if(!store) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: "no store with such id"
+                    }
+                ]
+            }
+        }
+
+        if(!payload || !payload.userId){
+            return {
+                errors: [
+                    {
+                        field: "payload",
+                        message: "provide user id in payload"
+                    }
+                ]
+            };
+        }
+        const hasAdminRights = await isAdmin(parseInt(payload?.userId), input.storeId)
+        if(!hasAdminRights) {
+            return {
+                errors: [
+                    {
+                        field: "admin",
+                        message: "no admin rights to that store"
+                    }
+                ]
+            }
+        }
+
+        store.name = input.name;
+        store.description = input.description;
+        store.description = input.description;
+        await getConnection().manager.save(store);
+        return {store};
     }
 }

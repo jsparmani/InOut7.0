@@ -6,8 +6,8 @@ import { MyContext } from "../types/MyContext";
 import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "type-graphql";
 import { getConnection } from "typeorm";
 import { ProductInput } from "./inputs/ProductInput";
-import { User } from "src/entity/User";
-import { checkIfAdmin, validateProductCreate } from "src/utils/validateProduct";
+import { User } from "../entity/User";
+import { checkIfAdmin, validateProductCreate } from "../utils/validateProduct";
 
 @ObjectType()
 class ProductResponse {
