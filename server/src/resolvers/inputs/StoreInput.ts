@@ -16,5 +16,5 @@ export class StoreCreateInput {
 @InputType()
 export class StoreGetInput {
     @Field()
-    id: number
+    storeId: number
 }

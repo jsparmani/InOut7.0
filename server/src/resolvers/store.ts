@@ -98,5 +98,45 @@ export class StoreResolver {
     async getStore(
         @Arg("input", () => StoreGetInput) input: StoreGetInput,
         @Ctx() {payload}: MyContext
-    )
+    ): Promise<StoreResponse> {
+        if (!payload?.userId) {
+            return {
+                errors: [
+                    {
+                        field: "userId",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+
+        const user = await User.findOne(parseInt(payload.userId), {
+            relations: ["stores"],
+        });
+        if(!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+
+        for(var i=0; i<user.stores.length; i++) {
+            var store = user.stores[i];
+            if(store.id === input.storeId) {
+                return {store};
+            }
+        }
+        return {
+            errors: [
+                {
+                    field: "storeId",
+                    message: "Store id not present"
+                }
+            ]
+        }
+    }
 }
