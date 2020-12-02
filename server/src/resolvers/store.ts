@@ -1,20 +1,21 @@
-import { Store } from "src/entity/Store";
-import { User } from "src/entity/User";
-import { isAuth } from "src/middleware/isAuth";
-import { FieldError } from "src/types/FieldError";
-import { MyContext } from "src/types/MyContext";
-import { validateCreateStore } from "src/utils/validateStore";
+import { Store } from "../entity/Store";
+import { User } from "../entity/User";
+import { isAuth } from "../middleware/isAuth";
+import { FieldError } from "../types/FieldError";
+import { MyContext } from "../types/MyContext";
+import { validateCreateStore } from "../utils/validateStore";
 import { 
     Arg,
     Ctx,
     Field, 
     Mutation, 
     ObjectType, 
+    Query, 
     Resolver, 
     UseMiddleware
 } from "type-graphql";
 import { getConnection } from "typeorm";
-import { StoreInput } from "./inputs/StoreInput";
+import { StoreCreateInput, StoreGetInput } from "./inputs/StoreInput";
 
 @ObjectType()
 class StoreResponse {
@@ -30,7 +31,7 @@ export class StoreResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => StoreResponse)
     async createStore(
-        @Arg("input", () => StoreInput) input: StoreInput,
+        @Arg("input", () => StoreCreateInput) input: StoreCreateInput,
         @Ctx() {payload}: MyContext
     ): Promise<StoreResponse> {
         const errors = validateCreateStore(input);
@@ -91,4 +92,11 @@ export class StoreResolver {
         await getConnection().manager.save(store);
         return {store};
     }
+
+    @UseMiddleware(isAuth)
+    @Query(() => StoreResponse)
+    async getStore(
+        @Arg("input", () => StoreGetInput) input: StoreGetInput,
+        @Ctx() {payload}: MyContext
+    )
 }

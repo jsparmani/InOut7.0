@@ -1,10 +1,7 @@
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class StoreInput {
-    @Field({nullable: true})
-    id: number
-
+export class StoreCreateInput {
     @Field()
     name: string;
 
@@ -14,4 +11,10 @@ export class StoreInput {
     @Field()
     // input.admins is array of user ids
     admins: number[];
+}
+
+@InputType()
+export class StoreGetInput {
+    @Field()
+    id: number
 }
