@@ -22,6 +22,9 @@ class StoreResponse {
     @Field(() => Store, {nullable: true})
     store?: Store;
 
+    @Field(() => [Store], {nullable: true})
+    stores?: Store[]
+
     @Field(() => [FieldError], {nullable: true})
     errors?:  FieldError[];
 }
@@ -82,7 +85,7 @@ export class StoreResolver {
                     errors: [
                         {
                             field: "admin",
-                            message: `user (admin) with id ${adminId} does not exist`
+                            message: `user (admin) does not exist`
                         }
                     ]
                 }
@@ -139,5 +142,40 @@ export class StoreResolver {
                 }
             ]
         }
+    }
+
+    @UseMiddleware(isAuth)
+    @Query(() => StoreResponse)
+    async listStores(
+        @Ctx() {payload}: MyContext
+    ): Promise<StoreResponse> {
+        if (!payload?.userId) {
+            return {
+                errors: [
+                    {
+                        field: "userId",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+
+        const user = await User.findOne(parseInt(payload.userId), {
+            relations: ["stores"],
+        });
+        if(!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+
+        var stores = user.stores;
+
+        return {stores};
     }
 }
