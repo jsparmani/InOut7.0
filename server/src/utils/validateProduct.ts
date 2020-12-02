@@ -2,7 +2,7 @@ import { Store } from "src/entity/Store";
 import { User } from "src/entity/User";
 import { ProductInput } from "../resolvers/inputs/ProductInput";
 
-export const validateProductCreateOrUpdate = (options: ProductInput) => {
+export const validateProductCreate = (options: ProductInput) => {
     const {name, code, availableQty, storeId} = options;
     if(name === "" || !name) {
         return[

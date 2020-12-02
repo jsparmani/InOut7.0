@@ -7,7 +7,7 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Resolver, UseMiddleware } from "
 import { getConnection } from "typeorm";
 import { ProductInput } from "./inputs/ProductInput";
 import { User } from "src/entity/User";
-import { checkIfAdmin, validateProductCreateOrUpdate } from "src/utils/validateProduct";
+import { checkIfAdmin, validateProductCreate } from "src/utils/validateProduct";
 
 @ObjectType()
 class ProductResponse {
@@ -22,7 +22,7 @@ class ProductResponse {
 export class ProductResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => ProductResponse)
-    async createOrUpdateProduct (
+    async createProduct (
         @Arg("input", () => ProductInput) input: ProductInput,
         @Ctx() {payload}: MyContext
     ): Promise<ProductResponse> {
@@ -50,7 +50,7 @@ export class ProductResolver {
             };
         }
 
-        const errors = validateProductCreateOrUpdate(input);
+        const errors = validateProductCreate(input);
         if(errors) {
             return {
                 errors,
