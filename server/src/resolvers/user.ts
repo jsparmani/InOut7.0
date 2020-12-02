@@ -1,11 +1,23 @@
+import {MyContext} from "./../types/MyContext";
+import {sendRefreshToken} from "./../utils/sendRefreshToken";
 import {validateRegister} from "./../utils/validateRegister";
 import {compare, hash} from "bcryptjs";
 import {User} from "../entity/User";
 import {FieldError} from "../types/FieldError";
 import {createAccessToken, createRefreshToken} from "../utils/auth";
-import {Arg, Field, Mutation, ObjectType, Query, Resolver} from "type-graphql";
+import {
+    Arg,
+    Ctx,
+    Field,
+    Mutation,
+    ObjectType,
+    Query,
+    Resolver,
+    UseMiddleware,
+} from "type-graphql";
 import {RegisterInput} from "./inputs/RegisterInput";
 import {LoginInput} from "./inputs/LoginInput";
+import {isAuth} from "../middleware/isAuth";
 
 @ObjectType()
 class AuthResponse {
@@ -17,9 +29,6 @@ class AuthResponse {
 
     @Field({nullable: true})
     accessToken?: string;
-
-    @Field({nullable: true})
-    refreshToken?: string;
 }
 
 @Resolver()
@@ -31,7 +40,8 @@ export class UserResolver {
 
     @Mutation(() => AuthResponse)
     async register(
-        @Arg("input", () => RegisterInput) input: RegisterInput
+        @Arg("input", () => RegisterInput) input: RegisterInput,
+        @Ctx() {res}: MyContext
     ): Promise<AuthResponse> {
         const {email, password} = input;
 
@@ -66,16 +76,18 @@ export class UserResolver {
         const accessToken = createAccessToken(user as User);
         const refreshToken = createRefreshToken(user as User);
 
+        sendRefreshToken(res, refreshToken);
+
         return {
             user,
             accessToken,
-            refreshToken,
         };
     }
 
     @Mutation(() => AuthResponse)
     async login(
-        @Arg("input", () => LoginInput) input: LoginInput
+        @Arg("input", () => LoginInput) input: LoginInput,
+        @Ctx() {res}: MyContext
     ): Promise<AuthResponse> {
         const {email, password} = input;
 
@@ -105,10 +117,36 @@ export class UserResolver {
             };
         }
 
+        sendRefreshToken(res, createRefreshToken(user));
+
         return {
             user,
             accessToken: createAccessToken(user),
-            refreshToken: createRefreshToken(user),
+        };
+    }
+
+    @Mutation(() => Boolean)
+    async logout(@Ctx() {res}: MyContext) {
+        sendRefreshToken(res, "");
+        return true;
+    }
+
+    @UseMiddleware(isAuth)
+    @Query(() => AuthResponse)
+    async me(@Ctx() {payload}: MyContext): Promise<AuthResponse> {
+        if (!payload?.userId) {
+            throw new Error("Invalid User");
+        }
+
+        let user = await User.findOne(parseInt(payload.userId), {
+            relations: ["profile"],
+        });
+
+        if (!user) {
+            throw new Error("User does not exist!");
+        }
+        return {
+            user,
         };
     }
 }
