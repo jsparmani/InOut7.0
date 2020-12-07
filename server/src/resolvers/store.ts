@@ -8,6 +8,7 @@ import {
     Arg,
     Ctx,
     Field, 
+    Int, 
     Mutation, 
     ObjectType, 
     Query, 
@@ -265,5 +266,49 @@ export class StoreResolver {
         store.description = input.description;
         await getConnection().manager.save(store);
         return {store};
+    }
+
+    @UseMiddleware(isAuth)
+    @Mutation(() => Int)
+    async deleteStore(
+        @Arg("input", () => StoreGetInput) input: StoreGetInput,
+        @Ctx() {payload}: MyContext
+    ): Promise<Int> {
+        if (!payload?.userId) {
+            return {
+                errors: [
+                    {
+                        field: "userId",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+        const user = await User.findOne(parseInt(payload.userId), {
+            relations: ["stores"],
+        });
+        if(!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "Missing",
+                    },
+                ],
+            };
+        }
+        const hasAdminRights = await isAdmin(parseInt(payload?.userId), input.storeId)
+        if(!hasAdminRights) {
+            return {
+                errors: [
+                    {
+                        field: "admin",
+                        message: "no admin rights to that store"
+                    }
+                ]
+            }
+        }
+        await Store.delete(input.storeId);
+        return input.storeId;
     }
 }
