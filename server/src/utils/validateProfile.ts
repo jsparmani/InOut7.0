@@ -1,4 +1,4 @@
-import {ProfileInput} from "src/resolvers/inputs/ProfileInput";
+import {ProfileInput} from "../resolvers/inputs/ProfileInput";
 
 export const validateProfileCreateOrUpdate = (options: ProfileInput) => {
     const {name, age, phone} = options;

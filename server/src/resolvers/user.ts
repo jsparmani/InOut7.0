@@ -139,7 +139,7 @@ export class UserResolver {
         }
 
         let user = await User.findOne(parseInt(payload.userId), {
-            relations: ["profile"],
+            relations: ["profile", "profile.addresses"],
         });
 
         if (!user) {
