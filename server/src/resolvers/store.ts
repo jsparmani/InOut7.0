@@ -1,22 +1,22 @@
-import { Store } from "../entity/Store";
-import { User } from "../entity/User";
-import { isAuth } from "../middleware/isAuth";
-import { FieldError } from "../types/FieldError";
-import { MyContext } from "../types/MyContext";
-import { isAdmin, validateCreateOrUpdateStore } from "../utils/validateStore";
-import { 
+import {Store} from "../entity/Store";
+import {User} from "../entity/User";
+import {isAuth} from "../middleware/isAuth";
+import {FieldError} from "../types/FieldError";
+import {MyContext} from "../types/MyContext";
+import {isAdmin, validateCreateOrUpdateStore} from "../utils/validateStore";
+import {
     Arg,
     Ctx,
-    Field, 
-    Int, 
-    Mutation, 
-    ObjectType, 
-    Query, 
-    Resolver, 
-    UseMiddleware
+    Field,
+    Int,
+    Mutation,
+    ObjectType,
+    Query,
+    Resolver,
+    UseMiddleware,
 } from "type-graphql";
-import { getConnection } from "typeorm";
-import { StoreCreateOrUpdateInput, StoreGetInput } from "./inputs/StoreInput";
+import {getConnection} from "typeorm";
+import {StoreCreateOrUpdateInput, StoreGetInput} from "./inputs/StoreInput";
 
 @ObjectType()
 class StoreResponse {
@@ -24,10 +24,10 @@ class StoreResponse {
     store?: Store;
 
     @Field(() => [Store], {nullable: true})
-    stores?: Store[]
+    stores?: Store[];
 
     @Field(() => [FieldError], {nullable: true})
-    errors?:  FieldError[];
+    errors?: FieldError[];
 }
 
 @Resolver()
@@ -35,21 +35,22 @@ export class StoreResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => StoreResponse)
     async createStore(
-        @Arg("input", () => StoreCreateOrUpdateInput) input: StoreCreateOrUpdateInput,
+        @Arg("input", () => StoreCreateOrUpdateInput)
+        input: StoreCreateOrUpdateInput,
         @Ctx() {payload}: MyContext
     ): Promise<StoreResponse> {
         const errors = validateCreateOrUpdateStore(input);
-        if(errors) {
+        if (errors) {
             return {
                 errors,
-            }
+            };
         }
 
         let store = await Store.create({
             name: input.name,
             description: input.description,
-            admins: []
-        })
+            admins: [],
+        });
 
         if (!payload?.userId) {
             return {
@@ -65,7 +66,7 @@ export class StoreResolver {
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["profile"],
         });
-        if(!user) {
+        if (!user) {
             return {
                 errors: [
                     {
@@ -78,18 +79,18 @@ export class StoreResolver {
 
         store.admins.push(user);
 
-        for(var i in input.admins) {
+        for (var i in input.admins) {
             // input.admins is array of user ids
             var admin = await User.findOne(input.admins[i]);
-            if(!admin) {
+            if (!admin) {
                 return {
                     errors: [
                         {
                             field: "admin",
-                            message: `user (admin) does not exist`
-                        }
-                    ]
-                }
+                            message: `user (admin) does not exist`,
+                        },
+                    ],
+                };
             }
             store.admins.push(admin);
         }
@@ -118,7 +119,7 @@ export class StoreResolver {
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["stores"],
         });
-        if(!user) {
+        if (!user) {
             return {
                 errors: [
                     {
@@ -129,9 +130,9 @@ export class StoreResolver {
             };
         }
 
-        for(var i=0; i<user.stores.length; i++) {
+        for (var i = 0; i < user.stores.length; i++) {
             var store = user.stores[i];
-            if(store.id === input.storeId) {
+            if (store.id === input.storeId) {
                 return {store};
             }
         }
@@ -139,17 +140,15 @@ export class StoreResolver {
             errors: [
                 {
                     field: "storeId",
-                    message: "Store id not present"
-                }
-            ]
-        }
+                    message: "Store id not present",
+                },
+            ],
+        };
     }
 
     @UseMiddleware(isAuth)
     @Query(() => StoreResponse)
-    async listStores(
-        @Ctx() {payload}: MyContext
-    ): Promise<StoreResponse> {
+    async listStores(@Ctx() {payload}: MyContext): Promise<StoreResponse> {
         if (!payload?.userId) {
             return {
                 errors: [
@@ -164,7 +163,7 @@ export class StoreResolver {
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["stores"],
         });
-        if(!user) {
+        if (!user) {
             return {
                 errors: [
                     {
@@ -183,7 +182,8 @@ export class StoreResolver {
     @UseMiddleware(isAuth)
     @Mutation(() => StoreResponse)
     async updateStore(
-        @Arg("input", () => StoreCreateOrUpdateInput) input: StoreCreateOrUpdateInput,
+        @Arg("input", () => StoreCreateOrUpdateInput)
+        input: StoreCreateOrUpdateInput,
         @Ctx() {payload}: MyContext
     ): Promise<StoreResponse> {
         if (!payload?.userId) {
@@ -200,7 +200,7 @@ export class StoreResolver {
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["profile"],
         });
-        if(!user) {
+        if (!user) {
             return {
                 errors: [
                     {
@@ -210,55 +210,58 @@ export class StoreResolver {
                 ],
             };
         }
-        const errors = validateCreateOrUpdateStore(input)
-        if(errors) {
+        const errors = validateCreateOrUpdateStore(input);
+        if (errors) {
             return {
-                errors
+                errors,
             };
         }
 
-        if(!input.storeId) {
+        if (!input.storeId) {
             return {
                 errors: [
                     {
                         field: "id",
-                        message: "Provide id for updation"
-                    }
-                ]
-            }
+                        message: "Provide id for updation",
+                    },
+                ],
+            };
         }
         const store = await Store.findOne(input.storeId);
-        if(!store) {
+        if (!store) {
             return {
                 errors: [
                     {
                         field: "id",
-                        message: "no store with such id"
-                    }
-                ]
-            }
+                        message: "no store with such id",
+                    },
+                ],
+            };
         }
 
-        if(!payload || !payload.userId){
+        if (!payload || !payload.userId) {
             return {
                 errors: [
                     {
                         field: "payload",
-                        message: "provide user id in payload"
-                    }
-                ]
+                        message: "provide user id in payload",
+                    },
+                ],
             };
         }
-        const hasAdminRights = await isAdmin(parseInt(payload?.userId), input.storeId)
-        if(!hasAdminRights) {
+        const hasAdminRights = await isAdmin(
+            parseInt(payload?.userId),
+            input.storeId
+        );
+        if (!hasAdminRights) {
             return {
                 errors: [
                     {
                         field: "admin",
-                        message: "no admin rights to that store"
-                    }
-                ]
-            }
+                        message: "no admin rights to that store",
+                    },
+                ],
+            };
         }
 
         store.name = input.name;
@@ -273,42 +276,48 @@ export class StoreResolver {
     async deleteStore(
         @Arg("input", () => StoreGetInput) input: StoreGetInput,
         @Ctx() {payload}: MyContext
-    ): Promise<Int> {
+    ): Promise<boolean> {
         if (!payload?.userId) {
-            return {
-                errors: [
-                    {
-                        field: "userId",
-                        message: "Missing",
-                    },
-                ],
-            };
+            // return {
+            //     errors: [
+            //         {
+            //             field: "userId",
+            //             message: "Missing",
+            //         },
+            //     ],
+            // };
+            return false;
         }
         const user = await User.findOne(parseInt(payload.userId), {
             relations: ["stores"],
         });
-        if(!user) {
-            return {
-                errors: [
-                    {
-                        field: "user",
-                        message: "Missing",
-                    },
-                ],
-            };
+        if (!user) {
+            // return {
+            //     errors: [
+            //         {
+            //             field: "user",
+            //             message: "Missing",
+            //         },
+            //     ],
+            // };
+            return false;
         }
-        const hasAdminRights = await isAdmin(parseInt(payload?.userId), input.storeId)
-        if(!hasAdminRights) {
-            return {
-                errors: [
-                    {
-                        field: "admin",
-                        message: "no admin rights to that store"
-                    }
-                ]
-            }
+        const hasAdminRights = await isAdmin(
+            parseInt(payload?.userId),
+            input.storeId
+        );
+        if (!hasAdminRights) {
+            // return {
+            //     errors: [
+            //         {
+            //             field: "admin",
+            //             message: "no admin rights to that store",
+            //         },
+            //     ],
+            // };
+            return false;
         }
         await Store.delete(input.storeId);
-        return input.storeId;
+        return true;
     }
 }

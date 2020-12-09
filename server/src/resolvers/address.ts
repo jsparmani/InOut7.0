@@ -1,5 +1,5 @@
-import { Address } from "../entity/Address";
-import { FieldError } from "../types/FieldError";
+import {Address} from "../entity/Address";
+import {FieldError} from "../types/FieldError";
 import {
     Arg,
     Ctx,
@@ -7,14 +7,14 @@ import {
     Mutation,
     ObjectType,
     Resolver,
-    UseMiddleware
+    UseMiddleware,
 } from "type-graphql";
-import { isAuth } from "../middleware/isAuth";
-import { AddressInput } from "./inputs/AddressInput";
-import { MyContext } from "../types/MyContext";
-import { User } from "../entity/User";
-import { validateAddressCreate } from "../utils/validateAddress";
-import { getConnection } from "typeorm";
+import {isAuth} from "../middleware/isAuth";
+import {AddressInput} from "./inputs/AddressInput";
+import {MyContext} from "../types/MyContext";
+import {User} from "../entity/User";
+import {validateAddressCreate} from "../utils/validateAddress";
+import {getConnection} from "typeorm";
 
 @ObjectType()
 class AddressResponse {
@@ -44,30 +44,6 @@ export class AddressResolver {
             };
         }
 
-        const user = await User.findOne(parseInt(payload.userId), {
-            relations: ["profile"],
-        });
-        if(!user) {
-            return {
-                errors: [
-                    {
-                        field: "user",
-                        message: "Missing",
-                    },
-                ],
-            };
-        }
-        if(!user.profile) {
-            return {
-                errors: [
-                    {
-                        field: "profile",
-                        message: "Missing",
-                    },
-                ],
-            };
-        }
-
         const errors = validateAddressCreate(input);
         if (errors) {
             return {
@@ -75,9 +51,33 @@ export class AddressResolver {
             };
         }
 
+        const user = await User.findOne(parseInt(payload.userId), {
+            relations: ["profile"],
+        });
+        if (!user) {
+            return {
+                errors: [
+                    {
+                        field: "user",
+                        message: "User does not exist",
+                    },
+                ],
+            };
+        }
+        if (!user.profile) {
+            return {
+                errors: [
+                    {
+                        field: "profile",
+                        message: "Please complete your profile first",
+                    },
+                ],
+            };
+        }
+
         const addressInstance = await Address.create({...input});
         addressInstance.profile = user.profile;
         await getConnection().manager.save(addressInstance);
-        return {address: addressInstance}
+        return {address: addressInstance};
     }
 }
