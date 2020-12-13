@@ -13,7 +13,7 @@ const Wrapper = (
 	...props: any
 ) => {
 	if (isPrivate && !isAuthenticated) {
-		return <Redirect to="/login" />;
+		return <Redirect to="/register" />;
 	}
 
 	if (isLoginRoute && isAuthenticated) {

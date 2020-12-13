@@ -1,7 +1,6 @@
 import React from "react";
 import Routes from "./routes";
-import { HashRouter as Router } from "react-router-dom";
-
+import { BrowserRouter as Router } from "react-router-dom";
 function App() {
 	return (
 		<div>
