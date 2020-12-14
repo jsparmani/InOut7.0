@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRegisterMutation } from "../../generated/graphql";
 interface RegisterProps {}
 
-export const Register: React.FC<RegisterProps> = ({}) => {
+export const Register: React.FC<RegisterProps> = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [register] = useRegisterMutation();

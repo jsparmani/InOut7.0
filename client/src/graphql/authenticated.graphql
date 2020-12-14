@@ -1,0 +1,7 @@
+query GetUserDetails {
+	me {
+		user {
+			id
+		}
+	}
+}
